@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de QR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        input {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        #qrcode {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Generador de Código QR</h2>
+    <input type="text" id="link" placeholder="Ingresa el enlace">
+    <button onclick="generarQR()">Generar QR</button>
+    <button id="descargar" style="display:none;" onclick="descargarQR()">Descargar PNG</button>
+    <div id="qrcode"></div>
+
+    <script>
+        function generarQR() {
+            let link = document.getElementById("link").value;
+            if (link.trim() === "") {
+                alert("Por favor, ingresa un enlace válido.");
+                return;
+            }
+
+            // Limpiar QR anterior
+            document.getElementById("qrcode").innerHTML = "";
+
+            // Generar QR
+            let qr = new QRCode(document.getElementById("qrcode"), {
+                text: link,
+                width: 400,
+                height: 400
+            });
+
+            // Mostrar botón de descarga después de generar el QR
+            setTimeout(() => {
+                document.getElementById("descargar").style.display = "inline-block";
+            }, 500);
+        }
+
+        function descargarQR() {
+            let qrCanvas = document.querySelector("#qrcode canvas");
+            if (!qrCanvas) {
+                alert("Genera un código QR primero.");
+                return;
+            }
+
+            // Crear un canvas para agregar el margen blanco
+            let canvas = document.createElement('canvas');
+            let context = canvas.getContext('2d');
+
+            // Añadir márgenes alrededor del QR
+            const margin = 20; // Margen en píxeles
+            canvas.width = qrCanvas.width + margin * 2;
+            canvas.height = qrCanvas.height + margin * 2;
+
+            // Rellenar con color blanco
+            context.fillStyle = "#FFFFFF";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Dibujar el QR dentro del canvas con el margen
+            context.drawImage(qrCanvas, margin, margin);
+
+            // Descargar la imagen con el margen
+            let link = document.createElement("a");
+            link.href = canvas.toDataURL("image/png");
+            link.download = "qr_code.png";
+            link.click();
+        }
+    </script>
+</body>
+</html>
